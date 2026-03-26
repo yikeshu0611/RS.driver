@@ -9,8 +9,8 @@
 RS.OpenChrome_DisablePicture <- function(port=4444){
   prefs = list("profile.managed_default_content_settings.images" = 2L)
   cprof <- list(chromeOptions = list(prefs = prefs))
-  remDr <<- remoteDriver(browserName = 'chrome', extraCapabilities = cprof,
+  .remDr <<- remoteDriver(browserName = 'chrome', extraCapabilities = cprof,
                          port = port) # change port as suits
-  remDr$open()
+  .remDr$open()
 }
 

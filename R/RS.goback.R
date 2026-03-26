@@ -8,6 +8,6 @@
 #' @examples RS.go_back(2)
 RS.go_back <- function(n=1){
   for (i in 1:n) {
-    remDr$goBack()
+    .remDr$goBack()
   }
 }

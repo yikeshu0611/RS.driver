@@ -7,10 +7,10 @@
 #'
 #' @examples RS.OpenChrome()
 RS.OpenChrome <- function(port=4444){
-  remDr <<-　remoteDriver(
+  .remDr <<-　remoteDriver(
     browserName = "chrome",
     remoteServerAddr = "localhost",
     port = port
   )
-  remDr$open()
+  .remDr$open()
 }

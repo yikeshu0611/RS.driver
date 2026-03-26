@@ -8,7 +8,7 @@
 #'
 #' @examples RS.input_Text_enter(xpath,text)
 RS.input_Text_enter <- function(xpath,text){
-  btn <- remDr$findElement(using = 'xpath', value = xpath)
+  btn <- .remDr$findElement(using = 'xpath', value = xpath)
   text <- list(text, key = 'enter')
   btn$sendKeysToElement(text)
 }

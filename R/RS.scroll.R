@@ -6,7 +6,7 @@
 #'
 #' @examples RS.scroll_to_end()
 RS.scroll_to_end <- function(){
-    webElem <- remDr$findElement("css", "body")
+    webElem <- .remDr$findElement("css", "body")
     webElem$sendKeysToElement(list(key = "end"))
 }
 
@@ -17,7 +17,7 @@ RS.scroll_to_end <- function(){
 #'
 #' @examples RS.scroll_to_home()
 RS.scroll_to_home <- function(){
-    webElem <- remDr$findElement("css", "body")
+    webElem <- .remDr$findElement("css", "body")
     webElem$sendKeysToElement(list(key = "home"))
 }
 
@@ -28,7 +28,7 @@ RS.scroll_to_home <- function(){
 #'
 #' @examples scroll_to_down_arrow()
 RS.scroll_to_down_arrow <- function(){
-    webElem <- remDr$findElement("css", "body")
+    webElem <- .remDr$findElement("css", "body")
     webElem$sendKeysToElement(list(key = 'down_arrow'))
 }
 
@@ -39,7 +39,7 @@ RS.scroll_to_down_arrow <- function(){
 #'
 #' @examples scroll_to_up_arrow（
 RS.scroll_to_up_arrow <- function(){
-    webElem <- remDr$findElement("css", "body")
+    webElem <- .remDr$findElement("css", "body")
     webElem$sendKeysToElement(list(key = 'up_arrow'))
 }
 

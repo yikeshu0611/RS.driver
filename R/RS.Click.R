@@ -7,7 +7,7 @@
 #'
 #' @examples RS.click(xpath)
 RS.click <- function(xpath) {
-  btn <- remDr$findElement(using = 'xpath', value = xpath)
-  remDr$mouseMoveToLocation(webElement = btn)
-  remDr$click()
+  btn <- .remDr$findElement(using = 'xpath', value = xpath)
+  .remDr$mouseMoveToLocation(webElement = btn)
+  .remDr$click()
 }
