@@ -48,22 +48,43 @@ query.train <- function(from,to,date=NULL){
 
 
     (fromss <- RS.get_elements('//ul[@id="from_station_ul"]/li') %>% html_text())
-    (checi <- RS.get_elements('//a[@title="点击查看停靠站信息"]') %>% html_text() %>% unique())
-    message('共有',length(checi),'个车次')
+    (toss <- RS.get_elements('//ul[@id="to_station_ul"]/li') %>% html_text())
+    (checi <- RS.get_elements('//a[@title="点击查看停靠站信息"]') %>% html_text())
+    message('共有',length(unique(checi)),'个车次')
 
     # 逐个点击，看看途径站
     (trs <- RS.get_elements('//div[@id="t-list"]/table/tbody/tr'))
-    (media <- lapply(1:length(trs),function(i){
-        clickit <- sprintf('//tbody[@id="queryLeftTable"]/tr[%s]//div[@class="train"]/div/a',i)
-        length(RS.get_elements(clickit))
-        if (length(RS.get_elements(clickit))>0){
+    for (i in 1:length(trs)){
+        if (i==1){
+            media <- c()
+            tbody <- RS.get_elements('//tbody[@id="queryLeftTable"]')
+            checi.final <- NULL
+        }
+        clickit <- sprintf('tr[%s]//a[@title="点击查看停靠站信息"]',i)
+        (alen <- length(html_elements(tbody,xpath = clickit)))
+        if (alen>0){
             RS.click(sprintf('//tbody[@id="queryLeftTable"]/tr[%s]//div[@class="train"]/div/a',i))
             Sys.sleep(1)
-            si <- RS.get_elements(sprintf('//tbody[@id="queryLeftTable"]/tr[%s]//div[@class="station-bd"]',i)) %>%
-                html_table() %>% do::list1() %>% as.data.frame() %>% do::select(j=2,drop=T)
-            si[-c(1:max(which(si %in% fromss)))]
+            (si <- RS.get_elements(sprintf('//tbody[@id="queryLeftTable"]/tr[%s]//div[@class="station-bd"]',i)) %>%
+                html_table() %>% do::list1() %>% as.data.frame() %>% do::select(j=2,drop=T))
+            media <- unique(c(media,si[-c(1:max(which(si %in% fromss)))]))
+
+            di <- data.frame(checi=html_elements(tbody,xpath = clickit) %>% html_text(),
+                             终点站=paste0(toss[toss %in% si],collapse = ','))
+            checi.final <- unique(rbind(checi.final,di))
         }
-    }) %>% unlist() %>% unique())
+    }
+    if (anyDuplicated(checi.final$checi)){
+        checi.final <- do::dup.connect(checi.final,'checi','终点站')
+        colnames(checi.final) <- do::Replace0(colnames(checi.final),' ')
+        checi.final$Freq <- NULL
+        checi.final$checi <- do::Replace0(checi.final$checi,' ')
+        checi.final$终点站 <- do::Replace0(checi.final$终点站,' ')
+        for (i in 1:nrow(checi.final)){
+            checi.final$终点站[i] <- paste0(toss[toss %in% strsplit(checi.final$终点站[i],',')[[1]]],collapse = ',')
+        }
+    }
+
     message('共有',length(media),'个途径站')
 
     pb <- txtProgressBar(max = length(media),width = 25,style = 3)
@@ -112,11 +133,14 @@ query.train <- function(from,to,date=NULL){
                 d1$出发时间到达时间 <- NULL
                 d1 <- cbind(di,d1)
 
-                di <- do::col_split(d1$`出发站/到达站`,',',colnames = c('出发站','到达站'))
+                di <- do::col_split(d1$`出发站/到达站`,',',colnames = c('出发站','途径站'))
                 d1$`出发站/到达站` <- NULL
                 d1 <- cbind(di,d1)
                 d1 <- d1[order(d1$出发时间,d1$到达时间),]
                 row.names(d1) <- NULL
+                d1 <- dplyr::left_join(d1,checi.final,c('车次'='checi'))
+                d1 <- d1[,unique(c('出发站','途径站','终点站',colnames(d1)))]
+                colnames(d1)[colnames(d1) == '途径站'] <- '购票终点站'
             }else{
                 d1 <- NULL
             }
